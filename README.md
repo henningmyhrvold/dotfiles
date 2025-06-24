@@ -18,5 +18,4 @@ List of folders and dotfiles in them:
 
 There are many ways to manage your dotfiles. I use an
 [Ansible playbook](https://github.com/justunsix/dotfiles-playbook)
-which installs and configures machines I use from base installation using
-package managers.
+which installs and configures machines I use.
