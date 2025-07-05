@@ -12,7 +12,6 @@ List of folders and dotfiles in them:
 - `ewww/` - [ewww](https://github.com/elkowar/eww) Widget System
 - `hypr/` - [Hyprland](https://hypr.land/) Compositor
 - `nvim/` - [neovim](https://neovim.io/) Editor
-- `ranger/` - [Ranger](https://wiki.archlinux.org/title/Ranger) TUI File Manager
 - `tmux` - [tmux](https://github.com/tmux/tmux/wiki) Terminal Multiplexer
 - `waybar/` - [Waybar](https://github.com/Alexays/Waybar) Bar
 - `wezterm/` - [WezTerm](https://wezfurlong.org/wezterm/index.html) Cross platform terminal emulator
