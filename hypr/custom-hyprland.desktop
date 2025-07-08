@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=Custom Hyprland
+Comment=Custom Hyprland launcher
+Exec=/home/hm/.config/hypr/wrappedhl
+Type=Application

@@ -10,22 +10,15 @@ export GTKTHEME=Catppuccin-Mocha-Standard-Teal-Dark
 export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORMTHEME=qt5ct
 export QT_STYLE_OVERRIDE=kvantum
-# export GDK_BACKEND="wayland,x11"
-# export LIBVA_DRIVER_NAME=nvidia
-# export GBM_BACKEND=nvidia-drm
-# export __GLX_VENDOR_LIBRARY_NAME=nvidia
 
-USBC=$(cat /sys/class/drm/card0-DP-1/status) # Display in USB C port
-DP=$(cat /sys/class/drm/card0-DP-2/status) # Display in Display Port
-# card1-eDP-1 on thinkpad
+EDP=$(cat /sys/class/drm/card1-eDP-1/status) # Internal laptop display
 
-
-if [ "$USBC" = 'disconnected' ] && [ "$DP" = 'disconnected' ]; then
-	export LAPTOP=1
-	export XCURSOR_SIZE=24
+if [ "$EDP" = 'connected' ]; then
+    export LAPTOP=1
+    export XCURSOR_SIZE=24
 else
-	export LAPTOP=0
-	export XCURSOR_SIZE=48
+    export LAPTOP=0
+    export XCURSOR_SIZE=48
 fi
 
 exec Hyprland
