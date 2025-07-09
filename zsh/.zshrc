@@ -7,9 +7,9 @@ fi
 
 # If you come from bash you might have to change your $PATH.
  export PATH=$HOME/.local/bin:$PATH
- export PATH="$HOME/.local/lib/python3.10/sitepackages/:$PATH"
- export PATH="$HOME/tools/llvm-project/build/bin:$PATH"
- export LD_LIBRARY_PATH="$HOME/tools/llvm-project/build/lib:$LD_LIBRARY_PATH"
+# export PATH="$HOME/.local/lib/python3.10/sitepackages/:$PATH"
+# export PATH="$HOME/tools/llvm-project/build/bin:$PATH"
+# export LD_LIBRARY_PATH="$HOME/tools/llvm-project/build/lib:$LD_LIBRARY_PATH"
  export EDITOR=nvim
 # Path to your oh-my-zsh installation.
 ZSH=/usr/share/oh-my-zsh/
@@ -19,7 +19,6 @@ ZSH=/usr/share/oh-my-zsh/
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 
-alias weather="tempy montreal -u metric"
 alias ls='lsd -a'
 
 # Set list of themes to pick from when loading at random
@@ -142,7 +141,5 @@ source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 #eval "$(starship init zsh)"
 
 # Load syntax highlighting; should be last.
-source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh 2>/dev/null
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+#source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh 2>/dev/null
+
