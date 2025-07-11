@@ -1,6 +1,0 @@
-[Desktop Entry]
-Name=Custom Hyprland
-Comment=Custom Hyprland launcher
-Exec=/home/hm/src/dotfiles/wrappedhl
-Type=Application
-Keywords=tiling;wayland;compositir;
