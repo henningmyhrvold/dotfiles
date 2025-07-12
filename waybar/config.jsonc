@@ -3,7 +3,7 @@
 	"height": 28,
 	"modules-left": ["custom/launcher","cpu","memory","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
-	"modules-right": ["pulseaudio","clock","battery","custom/power"],
+	"modules-right": ["pulseaudio","network","clock","battery","custom/power"],  // Added "network" here
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -39,12 +39,11 @@
 		"spacing": 10
 	},
     "clock": {
-    	"format": "Week {0:%V}    {0:%H:%M}    {0:%d/%m/%Y}"
+    	"format": "Week {0:%V}     {0:%H:%M}     {0:%d/%m/%Y}"
     },
     "cpu": {
     	"interval": 1,
-	"format": "  {icon0}{icon1}{icon2}{icon3} {usage:>2}%",
-    	"format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
+	"format": "  {usage:>2}%"
     },
     "memory": {
         "interval": 30,
@@ -67,5 +66,16 @@
         "exec-if": "[[ $(checkupdates-with-aur | wc -l) != 0 ]]",
         "interval": 15,
         "on-click": "kitty -e paru -Syu && notify-send 'The system has been updated' "
+    },
+    // Added network module configuration below
+    "network": {
+        "format-wifi": "  {essid} ({signalStrength}%)",
+        "format-ethernet": "  {ifname}: {ipaddr}/{cidr}",
+        "format-linked": "  {ifname} (No IP)",
+        "format-disconnected": "⚠ Disconnected",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr} | Up: {bandwidthUpBits} | Down: {bandwidthDownBits}",
+        "on-click-right": "nm-applet",
+        "interval": 10
     }
 }
