@@ -18,16 +18,17 @@ window#waybar.hidden {
 	margin-top: 4px;
 	padding-left: 10px;
 	padding-right: 10px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
     color: transparent;
 	background: transparent;
 }
 #workspaces {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 12px;
 	font-size: 4px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	background: #161320;
 	transition: none;
@@ -68,48 +69,48 @@ window#waybar.hidden {
 }
 
 #network {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #bd93f9;
 }
 
 #pulseaudio {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #1A1826;
-	background: transparent;
+	background: #FAE3B0;
 }
 
 #battery {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #B5E8E0;
 }
 
 #battery.charging, #battery.plugged {
 	color: #161320;
-    background-color: transparent;
+    background-color: #B5E8E0;
 }
 
 #battery.critical:not(.charging) {
-    background-color: transparent;
+    background-color: #B5E8E0;
     color: #161320;
     animation-name: blink;
     animation-duration: 0.5s;
@@ -126,122 +127,121 @@ window#waybar.hidden {
 }
 
 #backlight {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #F8BD96;
 }
 #clock {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
-	/*background: #1A1826;*/
+	background: #ABE9B3;
 }
 
 #memory {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	padding-right: 10px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #DDB6F2;
 }
 #cpu {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	padding-right: 10px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #96CDFB;
 }
 
 #tray {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	padding-right: 10px;
 	border-radius: 10px;
 	transition: none;
 	color: #B5E8E0;
-	background: transparent;
+	background: #161320;
 }
 
 #custom-launcher {
 	font-size: 20px;
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 5px;
 	border-radius: 10px;
 	transition: none;
     color: #89DCEB;
-    background: transparent;
+    background: #161320;
 }
 
 #custom-power {
 	font-size: 18px;
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	margin-right: 8px;
 	padding-left: 10px;
 	padding-right: 5px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #F28FAD;
 }
 
 #custom-wallpaper {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #C9CBFF;
 }
 
 #custom-updates {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #E8A2AF;
 }
 
 #custom-media {
-	margin-top: 4px;
+	margin-top: 3px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-bottom: 0px;
+	margin-bottom: 3px;
 	border-radius: 10px;
 	transition: none;
 	color: #161320;
-	background: transparent;
+	background: #F2CDCD;
 }
