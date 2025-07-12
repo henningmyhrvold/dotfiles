@@ -67,15 +67,15 @@
         "interval": 15,
         "on-click": "kitty -e paru -Syu && notify-send 'The system has been updated' "
     },
-    // Added network module configuration below
     "network": {
-        "format-wifi": "  {essid} ({signalStrength}%)",
+        "format-wifi": "{icon}  ({signalStrength}%)",
         "format-ethernet": "  {ifname}: {ipaddr}/{cidr}",
         "format-linked": "  {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
         "format-alt": "{ifname}: {ipaddr}/{cidr}",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr} | Up: {bandwidthUpBits} | Down: {bandwidthDownBits}",
         "on-click-right": "nm-applet",
-        "interval": 10
+        "interval": 10,
+        "format-icons": ["󰤟", "󰤢", "󰤥"]
     }
 }
