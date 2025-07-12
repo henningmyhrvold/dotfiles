@@ -2,7 +2,7 @@
     border: none;
     border-radius: 10px;
     font-family: "JetbrainsMono Nerd Font Propo";
-    font-size: 15px;
+    font-size: 13px;
     min-height: 10px;
 }
 
@@ -15,7 +15,7 @@ window#waybar.hidden {
 }
 
 #window {
-	margin-top: 6px;
+	margin-top: 4px;
 	padding-left: 10px;
 	padding-right: 10px;
 	border-radius: 10px;
@@ -24,7 +24,7 @@ window#waybar.hidden {
 	background: transparent;
 }
 #tags {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 12px;
 	font-size: 4px;
 	margin-bottom: 0px;
@@ -37,7 +37,7 @@ window#waybar.hidden {
 	transition: none;
 	color: #B5E8E0;
 	background: transparent;
-	font-size: 16px;
+	font-size: 14px;
 	border-radius: 2px;
 }
 
@@ -68,7 +68,7 @@ window#waybar.hidden {
 }
 
 #network {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -80,7 +80,7 @@ window#waybar.hidden {
 }
 
 #pulseaudio {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -92,7 +92,7 @@ window#waybar.hidden {
 }
 
 #battery {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -126,7 +126,7 @@ window#waybar.hidden {
 }
 
 #backlight {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -137,7 +137,7 @@ window#waybar.hidden {
 	background: #F8BD96;
 }
 #clock {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -150,7 +150,7 @@ window#waybar.hidden {
 }
 
 #memory {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	margin-bottom: 0px;
@@ -161,7 +161,7 @@ window#waybar.hidden {
 	background: #DDB6F2;
 }
 #cpu {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	margin-bottom: 0px;
@@ -173,7 +173,7 @@ window#waybar.hidden {
 }
 
 #tray {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	margin-bottom: 0px;
@@ -185,8 +185,8 @@ window#waybar.hidden {
 }
 
 #custom-launcher {
-	font-size: 24px;
-	margin-top: 6px;
+	font-size: 20px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 5px;
@@ -197,8 +197,8 @@ window#waybar.hidden {
 }
 
 #custom-power {
-	font-size: 20px;
-	margin-top: 6px;
+	font-size: 18px;
+	margin-top: 4px;
 	margin-left: 8px;
 	margin-right: 8px;
 	padding-left: 10px;
@@ -211,7 +211,7 @@ window#waybar.hidden {
 }
 
 #custom-wallpaper {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -223,7 +223,7 @@ window#waybar.hidden {
 }
 
 #custom-updates {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -235,7 +235,7 @@ window#waybar.hidden {
 }
 
 #custom-media {
-	margin-top: 6px;
+	margin-top: 4px;
 	margin-left: 8px;
 	padding-left: 10px;
 	padding-right: 10px;

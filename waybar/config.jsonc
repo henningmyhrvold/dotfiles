@@ -1,5 +1,6 @@
 {
 	"layer": "top",
+	"height": 28,
 	"modules-left": ["custom/launcher","cpu","memory","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
 	"modules-right": ["pulseaudio","clock","battery","custom/power"],
@@ -39,7 +40,7 @@
 	},
     "clock": {
     	"format": "Week {0:%V}   {0:%H:%M}   {0:%d/%m/%Y}"
-    }
+    },
     "cpu": {
     	"interval": 1,
 	"format": "  {icon0}{icon1}{icon2}{icon3} {usage:>2}%",
