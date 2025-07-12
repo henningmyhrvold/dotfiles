@@ -1,8 +1,8 @@
 {
 	"layer": "top",
-	"modules-left": ["custom/launcher","cpu","memory","custom/media","tray"],
+	"modules-left": ["custom/launcher","cpu","memory","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
-	"modules-right": ["custom/updates","pulseaudio","clock","battery","custom/lock"],
+	"modules-right": ["pulseaudio","clock","battery","custom/power"],
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -21,18 +21,6 @@
 			"*": 6
 		}
     },
-	"network": {
-		"tooltip": false,
-		"format-wifi": "  {essid}",
-		"format-ethernet": ""
-	},
-	"backlight": {
-		"tooltip": false,
-		"format": " {}%",
-		"interval":1,
-        "on-scroll-up": "light -A 5",
-		"on-scroll-down": "light -U 5"
-	},
     "battery": {
         "states": {
             "good": 95,
@@ -50,7 +38,7 @@
 		"spacing": 10
 	},
     "clock": {
-    	"format": "Week {0:%V}   {0:%H:%M}   {0:%d/%m/%Y}"
+    	"format": "Week {0:%V}   { 0:%H:%M}   { 0:%d/%m/%Y}"
     },
     "cpu": {
     	"interval": 1,
@@ -67,7 +55,7 @@
         "on-click": "wofi -show drun",
         "on-click-right": "killall wofi"
     },
-    "custom/lock": {
+    "custom/power": {
     	"tooltip": false,
     	"on-click": "sh -c '(sleep 0.5s; hyprlock)' & disown",
     	"format": ""
