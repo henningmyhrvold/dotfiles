@@ -68,7 +68,7 @@
         "on-click": "kitty -e paru -Syu && notify-send 'The system has been updated' "
     },
     "network": {
-        "format-wifi": "{icon}  ({signalStrength}%)",
+        "format-wifi": "{icon}",
         "format-ethernet": "  {ifname}: {ipaddr}/{cidr}",
         "format-linked": "  {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
