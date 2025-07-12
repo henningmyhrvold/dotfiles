@@ -50,7 +50,7 @@
 		"spacing": 10
 	},
     "clock": {
-    	"format": "Week {:%V}   {:%H:%M}   {:%d/%m/%Y}"
+    	"format": "Week {0:%V}   {0:%H:%M}   {0:%d/%m/%Y}"
     },
     "cpu": {
     	"interval": 1,
@@ -73,7 +73,7 @@
     	"format": ""
     },
     "custom/updates":{
-        "format": "{} Update(s)",
+        "format": "{} Updates",
         "exec": "checkupdates-with-aur | wc -l",
         "exec-if": "[[ $(checkupdates-with-aur | wc -l) != 0 ]]",
         "interval": 15,
