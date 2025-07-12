@@ -38,8 +38,8 @@
 		"spacing": 10
 	},
     "clock": {
-    	"format": "Week {0:%V}   { 0:%H:%M}   { 0:%d/%m/%Y}"
-    },
+    	"format": "Week {0:%V}   {0:%H:%M}   {0:%d/%m/%Y}"
+    }
     "cpu": {
     	"interval": 1,
 	"format": "  {icon0}{icon1}{icon2}{icon3} {usage:>2}%",
@@ -58,7 +58,7 @@
     "custom/power": {
     	"tooltip": false,
     	"on-click": "sh -c '(sleep 0.5s; hyprlock)' & disown",
-    	"format": ""
+    	"format": " "
     },
     "custom/updates":{
         "format": "{} Updates",
