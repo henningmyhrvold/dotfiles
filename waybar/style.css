@@ -7,7 +7,7 @@
 }
 
 window#waybar {
-	background: #000000;
+	background: transparent;
 }
 
 window#waybar.hidden {
@@ -29,7 +29,7 @@ window#waybar.hidden {
 	font-size: 4px;
 	margin-bottom: 0px;
 	border-radius: 10px;
-	background: transparent;
+	background: #161320;
 	transition: none;
 }
 
