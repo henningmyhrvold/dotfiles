@@ -1,8 +1,8 @@
 {
 	"layer": "top",
 	"modules-left": ["custom/launcher","cpu","memory","custom/media","tray"],
-	"modules-center": ["river/tags"],
-	"modules-right": ["custom/updates","custom/wallpaper","backlight","pulseaudio","clock", "battery","custom/power"],
+	"modules-center": ["hyprland/workspaces"],
+	"modules-right": ["custom/updates","pulseaudio","clock","battery","custom/lock"],
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -15,8 +15,11 @@
 		}
 	},
 
-    "river/tags": {
-		"num-tags": 6
+    "hyprland/workspaces": {
+		"format": "{name}",
+		"persistent-workspaces": {
+			"*": 6
+		}
     },
 	"network": {
 		"tooltip": false,
@@ -50,46 +53,30 @@
         "format": "{: %I:%M %p   %d/%m/%Y}"
     },
     "cpu": {
-        "interval": 15,
-        "format": " {}%",
-        "max-length": 10
+    	"interval": 1,
+	"format": "  {icon0}{icon1}{icon2}{icon3} {usage:>2}%",
+    	"format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
     },
     "memory": {
         "interval": 30,
-        "format": " {}%",
+        "format": "    {used:0.1f}G/{total:0.1f}G",
         "max-length": 10
-    },
-    "custom/media": {
-        "interval": 30,
-        "format": "{icon} {}",
-        "return-type": "json",
-        "max-length": 20,
-        "format-icons": {
-            "spotify": " ",
-            "default": " "
-        },
-        "escape": true,
-        "exec": "$HOME/.config/system_scripts/mediaplayer.py 2> /dev/null",
-        "on-click": "playerctl play-pause"
     },
     "custom/launcher":{
         "format": " ",
         "on-click": "rofi -show drun",
         "on-click-right": "killall rofi"
     },
-    "custom/power":{
-        "format": " ",
-        "on-click": "bash ~/.config/rofi/leave/leave.sh",
+    "custom/lock": {
+    	"tooltip": false,
+    	"on-click": "sh -c '(sleep 0.5s; hyprlock)' & disown",
+    	"format": ""
     },
     "custom/updates":{
         "format": "{} Update(s)",
-        "exec": "checkupdates | wc -l",
-        "exec-if": "[[ $(checkupdates | wc -l) != 0 ]]",
+        "exec": "checkupdates-with-aur | wc -l",
+        "exec-if": "[[ $(checkupdates-with-aur | wc -l) != 0 ]]",
         "interval": 15,
-        "on-click": "alacritty -e paru -Syu && notify-send 'The system has been updated' "
-    },
-    "custom/wallpaper":{
-        "format":" ",
-        "on-click": "bash ~/.config/system_scripts/pkill_bc"
+        "on-click": "kitty -e paru -Syu && notify-send 'The system has been updated' "
     }
 }
