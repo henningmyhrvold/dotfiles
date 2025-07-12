@@ -1,9 +1,9 @@
 {
 	"layer": "top",
 	"height": 28,
-	"modules-left": ["custom/launcher","cpu","memory","custom/updates"],
+	"modules-left": ["custom/launcher","network","cpu","memory","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
-	"modules-right": ["pulseaudio","network","clock","battery","custom/power"],  // Added "network" here
+	"modules-right": ["pulseaudio","clock","battery","custom/power"], 
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -75,7 +75,7 @@
         "format-alt": "{ifname}: {ipaddr}/{cidr}",
         "tooltip-format": "{ifname}: {ipaddr}/{cidr} | Up: {bandwidthUpBits} | Down: {bandwidthDownBits}",
         "on-click-right": "nm-applet",
-        "interval": 10,
-        "format-icons": ["󰤟", "󰤢", "󰤥"]
+        "interval": 1,
+        "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"]
     }
 }
