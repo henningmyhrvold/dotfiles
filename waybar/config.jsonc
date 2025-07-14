@@ -64,8 +64,8 @@
         "format": "{} Updates",
         "exec": "checkupdates-with-aur | wc -l",
         "exec-if": "[[ $(checkupdates-with-aur | wc -l) != 0 ]]",
-        "interval": 600,
-        "on-click": "kitty -e paru -Syu && notify-send 'The system has been updated' "
+        "interval": 60,
+        "on-click": "ghostty -e paru -Syu && notify-send 'The system has been updated' "
     },
     "network": {
         "format-wifi": "{icon} ",
