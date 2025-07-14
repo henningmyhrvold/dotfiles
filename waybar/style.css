@@ -2,7 +2,7 @@
     border: none;
     border-radius: 10px;
     font-family: "JetbrainsMono Nerd Font Propo";
-    font-size: 13px;
+    font-size: 12px;
     min-height: 10px;
 }
 
@@ -72,7 +72,7 @@ window#waybar.hidden {
 #network {
 	margin-top: 3px;
 	margin-left: 8px;
-	padding-left: 10px;
+	padding-left: 12px;
 	padding-right: 10px;
 	margin-bottom: 3px;
 	border-radius: 10px;
@@ -189,6 +189,7 @@ window#waybar.hidden {
 	font-size: 20px;
 	margin-top: 3px;
 	margin-left: 8px;
+  margin-bottom: 3px;
 	padding-left: 10px;
 	padding-right: 5px;
 	border-radius: 10px;
@@ -202,7 +203,7 @@ window#waybar.hidden {
 	margin-top: 3px;
 	margin-left: 8px;
 	margin-right: 8px;
-	padding-left: 10px;
+	padding-left: 12px;
 	padding-right: 5px;
 	margin-bottom: 3px;
 	border-radius: 10px;
@@ -233,6 +234,18 @@ window#waybar.hidden {
 	transition: none;
 	color: #161320;
 	background: #E8A2AF;
+}
+
+#disk {
+	margin-top: 3px;
+	margin-left: 8px;
+	padding-left: 10px;
+	margin-bottom: 3px;
+	padding-right: 10px;
+	border-radius: 10px;
+	transition: none;
+	color: #161320;
+	background: #F5C2E7;
 }
 
 #custom-media {

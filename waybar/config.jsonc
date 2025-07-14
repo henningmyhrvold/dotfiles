@@ -1,7 +1,7 @@
 {
 	"layer": "top",
 	"height": 28,
-	"modules-left": ["custom/launcher","network","cpu","memory","custom/updates"],
+	"modules-left": ["custom/launcher","network","cpu","memory","disk","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
 	"modules-right": ["pulseaudio","clock","battery","custom/power"], 
 	
@@ -66,6 +66,12 @@
         "exec-if": "[[ $(checkupdates-with-aur | wc -l) != 0 ]]",
         "interval": 60,
         "on-click": "ghostty -e paru -Syu && notify-send 'The system has been updated' "
+    },
+        "disk": {
+        "interval": 30,
+        "format": " {used}/{total}",
+        "tooltip": false,
+        "path": "/"
     },
     "network": {
         "format-wifi": "{icon} ",
