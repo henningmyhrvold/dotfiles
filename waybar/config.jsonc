@@ -61,7 +61,7 @@
     	"format": " "
     },
     "custom/updates": {
-         "format": " {}",
+         "format": "  {}",
          "exec": "checkupdates-with-aur | wc -l",
          "interval": 60,
          "on-click": "ghostty -e paru -Syu && notify-send 'The system has been updated' "
