@@ -67,9 +67,9 @@
         "interval": 60,
         "on-click": "ghostty -e paru -Syu && notify-send 'The system has been updated' "
     },
-    "custom/disk": {
+        "custom/disk": {
         "format": " {}",
-        "exec": "df -B GiB / | tail -1 | awk '{print $3 \"G/\" $2 \"G\"}'",
+        "exec": "df -B GiB / | tail -1 | awk '{ sub(/GiB$/, \"\", $2); sub(/GiB$/, \"\", $3); print $3 \"G/\" $2 \"G\" }'",
         "interval": 30
     },
     "network": {
