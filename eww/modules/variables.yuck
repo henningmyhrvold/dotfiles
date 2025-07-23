@@ -1,3 +1,0 @@
-(defvar selected '')
-(deflisten wsjsona `scripts/overview1`)
-(deflisten wsjsonb `scripts/overview2`)
