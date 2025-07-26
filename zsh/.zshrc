@@ -126,3 +126,4 @@ SAVEHIST=10000
 setopt appendhistory
 
 export EDITOR=nvim
+export XDG_SESSION_TYPE=wayland
