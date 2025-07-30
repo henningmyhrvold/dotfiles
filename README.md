@@ -3,24 +3,35 @@
 Configuration and customization files to personalize Linux and macOS.
 This repository contains my personal dotfiles
 
+## Usage
+
+**Change myuser name with youruser name**
+```bash
+find . -type d -name "*myuser*" -print0 | xargs -0 -I {} sh -c 'mv "$1" "${1/myuser/youruser}"' sh {}
+git grep -l myuser | xargs sed -i 's/myuser/youruser/g'
+```
+
+
 ## Repository Structure
 
 List of folders and dotfiles in them:
 
-- `cool-retro-term/` - [Cool Retro Term](https://github.com/Swordfish90/cool-retro-term)
-- `dunst/` - [neovim](https://wiki.archlinux.org/title/Dunst) Notifications
-- `ewww/` - [ewww](https://github.com/elkowar/eww) Widget System
-- `hypr/` - [Hyprland](https://hypr.land/) Compositor
-- `nvim/` - [neovim](https://neovim.io/) Editor
-- `tmux` - [tmux](https://github.com/tmux/tmux/wiki) Terminal Multiplexer
-- `waybar/` - [Waybar](https://github.com/Alexays/Waybar) Bar
-- `wezterm/` - [WezTerm](https://wezfurlong.org/wezterm/index.html) Cross platform terminal emulator
-- `wofi/` - [wofi](https://github.com/fuzzybritches0/wofi) App Launcher
-- `zsh/` - [zsh](https://www.zsh.org/) Shell
+- `cool-retro-term/` - Cool Retro Term
+- `dunst/` - Notifications
+- `fonts/` - Fonts
+- `ghostty/` - Terminal
+- `hypr/` - Hyprland Compositor
+- `nvim/` - Neovim
+- `sddm/` - Login manager
+- `tmux` - tmux Terminal Multiplexer
+- `tmux-sessionizer` - tmux Sessionizer Plugin
+- `wallpaper/` - Wallpaper
+- `waybar/` - Waybar
+- `wezterm/` - Wezterm
+- `wofi/` - App Launcher
+- `zsh/` - zsh Shell
 
 
 ## How Dotfiles are Managed
 
-There are many ways to manage your dotfiles. I use an
-[Ansible playbook](https://github.com/justunsix/dotfiles-playbook)
-which installs and configures machines I use.
+There are many ways to manage your dotfiles. I use an Ansible playbook

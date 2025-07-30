@@ -1,9 +1,9 @@
-require("hm.set")
-require("hm.remap")
-require("hm.lazy_init")
+require("myuser.set")
+require("myuser.remap")
+require("myuser.lazy_init")
 
 local augroup = vim.api.nvim_create_augroup
-local hmGroup = augroup('hm', {})
+local myuserGroup = augroup('myuser', {})
 
 local autocmd = vim.api.nvim_create_autocmd
 local yank_group = augroup('HighlightYank', {})
@@ -30,13 +30,13 @@ autocmd('TextYankPost', {
 })
 
 autocmd({"BufWritePre"}, {
-    group = hmGroup,
+    group = myuserGroup,
     pattern = "*",
     command = [[%s/\s\+$//e]],
 })
 
 autocmd('BufEnter', {
-    group = hmGroup,
+    group = myuserGroup,
     callback = function()
         if vim.bo.filetype == "zig" then
             vim.cmd.colorscheme("tokyonight-night")
@@ -48,7 +48,7 @@ autocmd('BufEnter', {
 
 
 autocmd('LspAttach', {
-    group = hmGroup,
+    group = myuserGroup,
     callback = function(e)
         local opts = { buffer = e.buf }
         vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
