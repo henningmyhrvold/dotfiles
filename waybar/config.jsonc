@@ -3,7 +3,7 @@
 	"height": 28,
 	"modules-left": ["custom/launcher","network","cpu","memory","custom/disk","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
-	"modules-right": ["pulseaudio","clock","battery","custom/power"], 
+	"modules-right": ["pulseaudio","clock","clock#date","battery","custom/power"], 
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -39,7 +39,10 @@
 		"spacing": 10
 	},
     "clock": {
-    	"format": "Week {0:%V}     {0:%H:%M}     {0:%d/%m/%Y}"
+    	"format": "    {0:%H:%M}"
+    },
+    "clock#date": {
+    	"format": "   {0:%d/%m/%Y} {0:%V}"
     },
     "cpu": {
     	"interval": 5,
