@@ -39,10 +39,10 @@
 		"spacing": 10
 	},
     "clock": {
-    	"format": "    {0:%H:%M}"
+    	"format": "   {0:%H:%M}"
     },
     "clock#date": {
-    	"format": "   {0:%d/%m/%Y} {0:%V}"
+    	"format": "  {0:%d/%m/%Y}  ({0:%V})"
     },
     "cpu": {
     	"interval": 5,
