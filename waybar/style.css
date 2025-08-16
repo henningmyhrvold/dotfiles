@@ -239,7 +239,6 @@ window#waybar.hidden {
 	transition: none;
 	color: #161320;
 	background: #89DCEB;
-	text-transform: uppercase;
 }
 
 #pulseaudio {
