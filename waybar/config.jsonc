@@ -87,6 +87,7 @@
     },
     "hyprland/language": {
         "format": "{short}",
-        "tooltip-format": "{long}"
+        "tooltip-format": "{long}",
+        "on-click": "hyprctl switchxkblayout next"
     }
 }
