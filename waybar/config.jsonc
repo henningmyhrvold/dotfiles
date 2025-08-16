@@ -42,7 +42,7 @@
     	"format": "   {:%H:%M}"
     },
     "clock#date": {
-    	"format": "  {:%d/%m/%Y}  ({:%V})"
+    	"format": "  {0:%d/%m/%Y}  ({0:%V})"
     },
     "cpu": {
     	"interval": 5,
