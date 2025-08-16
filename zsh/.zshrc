@@ -124,6 +124,7 @@ HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export EDITOR=nvim
 export XDG_SESSION_TYPE=wayland
