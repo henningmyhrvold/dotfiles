@@ -70,30 +70,6 @@ window#waybar.hidden {
     color: #E8A2AF;
 }
 
-#network {
-	margin-top: 3px;
-	margin-left: 8px;
-	padding-left: 12px;
-	padding-right: 10px;
-	margin-bottom: 3px;
-	border-radius: 10px;
-	transition: none;
-	color: #161320;
-	background: #bd93f9;
-}
-
-#pulseaudio {
-	margin-top: 3px;
-	margin-left: 8px;
-	padding-left: 10px;
-	padding-right: 10px;
-	margin-bottom: 3px;
-	border-radius: 10px;
-	transition: none;
-	color: #1A1826;
-	background: #FAE3B0;
-}
-
 #battery {
 	margin-top: 3px;
 	margin-left: 8px;
@@ -239,13 +215,40 @@ window#waybar.hidden {
 	background: #F5C2E7;
 }
 
-#language {
+#network {
 	margin-top: 3px;
 	margin-left: 8px;
+	padding-left: 12px;
+	padding-right: 10px;
+	margin-bottom: 3px;
+	margin-right: 0;
+	border-radius: 10px 0 0 10px;
+	transition: none;
+	color: #161320;
+	background: #89DCEB;
+}
+
+#language {
+	margin-top: 3px;
+	margin-left: 0;
 	padding-left: 10px;
 	padding-right: 10px;
 	margin-bottom: 3px;
-	border-radius: 10px;
+	margin-right: 0;
+	border-radius: 0;
+	transition: none;
+	color: #161320;
+	background: #89DCEB;
+	text-transform: uppercase;
+}
+
+#pulseaudio {
+	margin-top: 3px;
+	margin-left: 0;
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-bottom: 3px;
+	border-radius: 0 10px 10px 0;
 	transition: none;
 	color: #161320;
 	background: #89DCEB;
