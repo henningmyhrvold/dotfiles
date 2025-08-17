@@ -3,7 +3,7 @@ VIM="nvim"
 
 
 ## All that sweet sweet fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export GIT_EDITOR=$VIM
 export DEV_ENV_HOME="$HOME/src"
