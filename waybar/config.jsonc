@@ -75,7 +75,7 @@
         "interval": 30
     },
     "network": {
-        "format-wifi": "{icon}",
+        "format-wifi": "{icon} ",
         "format-ethernet": "  {ifname}: {ipaddr}/{cidr}",
         "format-linked": "  {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
