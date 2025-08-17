@@ -80,7 +80,9 @@ alias v='nvim'
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-#plugins=(git asdf)
+plugins=(git asdf zsh-autosuggestions)
+
+bindkey '^ ' autosuggest-accept
 
 ZSH_CACHE_DIR=$HOME/.cache/oh-my-zsh
 if [[ ! -d $ZSH_CACHE_DIR ]]; then
@@ -121,8 +123,8 @@ source ~/.zsh/catppuccin_mocha-zsh-syntax-highlighting.zsh
 source ~/.zsh_profile
 
 HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=100000
+SAVEHIST=100000
 setopt appendhistory
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
