@@ -5,10 +5,10 @@ This repository contains my personal dotfiles
 
 ## Usage
 
-**Change myuser name with youruser name**
+**Change the henning username with youruser**
 ```bash
-find . -type d -name "*myuser*" -print0 | xargs -0 -I {} sh -c 'mv "$1" "${1/myuser/youruser}"' sh {}
-git grep -l myuser | xargs sed -i 's/myuser/youruser/g'
+find . -type d -name "*henning*" -print0 | xargs -0 -I {} sh -c 'mv "$1" "${1/henning/youruser}"' sh {}
+git grep -l henning | xargs sed -i 's/henning/youruser/g'
 ```
 
 

@@ -57,8 +57,8 @@ config.keys = {
     mods = "LEADER",
     action = wezterm.action.SwitchToWorkspace {
       spawn = {
-                cwd = "/home/myuser/src",
-        args = { "nvim", "/home/myuser/src" },
+                cwd = "/home/henning/src",
+        args = { "nvim", "/home/henning/src" },
       },
     },
   },
@@ -70,8 +70,8 @@ config.keys = {
             wezterm.log_error("wezterm.action.callback start")
             window:perform_action(wezterm.action.SwitchToWorkspace {
                 spawn = {
-                    cwd = "/home/myuser/src",
-                    args = { "nvim", "/home/myuser/src/env/.config/wezterm/wezterm.lua" },
+                    cwd = "/home/henning/src",
+                    args = { "nvim", "/home/henning/src/env/.config/wezterm/wezterm.lua" },
                 },
             }, pane)
             wezterm.log_error("wezterm.action.callback done")
