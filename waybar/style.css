@@ -104,7 +104,7 @@ window#waybar.hidden {
     }
 }
 
-#clock {
+#clock.time {
     margin-top: 3px;
     margin-left: 8px;
     padding-left: 10px;
@@ -113,10 +113,10 @@ window#waybar.hidden {
     border-radius: 10px;
     transition: none;
     color: #161320;
-    background: #F8BD96 !important;
+    background: #F8BD96;
 }
 
-#clock-date {
+#clock.date {
     margin-top: 3px;
     margin-left: 8px;
     padding-left: 10px;
@@ -125,7 +125,7 @@ window#waybar.hidden {
     border-radius: 10px;
     transition: none;
     color: #161320;
-    background: #ABE9B3 !important;
+    background: #ABE9B3;
 }
 
 #memory {

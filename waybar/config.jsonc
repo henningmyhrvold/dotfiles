@@ -1,7 +1,7 @@
 {
 	"layer": "top",
 	"height": 28,
-	"modules-left": ["custom/launcher","battery","clock#date","clock","custom/updates"],
+	"modules-left": ["custom/launcher","battery","clock#date","clock#time","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
 	"modules-right": ["custom/disk","cpu","memory","temperature","network","hyprland/language","pulseaudio","custom/power"], 
 	
@@ -38,11 +38,13 @@
 		"icon-size":18,
 		"spacing": 10
 	},
-    "clock": {
-    	"format": "   {:%H:%M}"
+    "clock#time": {
+    	"format": "   {:%H:%M}",
+        "tooltip": false
     },
     "clock#date": {
-    	"format": "  {0:%d/%m/%Y}  ({0:%V})"
+    	"format": "  {0:%d/%m/%Y}  ({0:%V})",
+        "tooltip": false
     },
     "cpu": {
     	"interval": 5,
