@@ -1,9 +1,9 @@
 {
 	"layer": "top",
 	"height": 28,
-	"modules-left": ["custom/launcher","clock#date","clock","custom/updates"],
+	"modules-left": ["custom/launcher","battery","clock#date","clock","custom/updates"],
 	"modules-center": ["hyprland/workspaces"],
-	"modules-right": ["custom/disk","cpu","memory","battery","network","hyprland/language","pulseaudio","custom/power"], 
+	"modules-right": ["custom/disk","cpu","memory","temperature","network","hyprland/language","pulseaudio","custom/power"], 
 	
 	"pulseaudio": {
 		"tooltip": false,
@@ -75,7 +75,7 @@
         "interval": 30
     },
     "network": {
-        "format-wifi": "{icon} ",
+        "format-wifi": "{icon}",
         "format-ethernet": "  {ifname}: {ipaddr}/{cidr}",
         "format-linked": "  {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
@@ -84,6 +84,14 @@
         "on-click-right": "nm-applet",
         "interval": 30,
         "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"]
+    },
+    "temperature": {
+        "thermal-zone": 9,
+        "interval": 5,
+        "format": " {temperatureC}°C",
+        "format-critical": " {temperatureC}°C 🔥",
+        "critical-threshold": 80,
+        "tooltip-format": "CPU Temperature: {temperatureC}°C"
     },
     "hyprland/language": {
         "format": "{short}",

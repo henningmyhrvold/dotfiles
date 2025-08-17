@@ -252,3 +252,25 @@ window#waybar.hidden {
 	color: #161320;
 	background: #89DCEB;
 }
+
+#temperature {
+    margin-top: 3px;
+    margin-left: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 3px;
+    border-radius: 10px;
+    transition: none;
+    color: #161320;
+    background: #FAE3B0;
+}
+
+#temperature.critical {
+    background-color: #BF616A;
+    color: #B5E8E0;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
