@@ -104,7 +104,7 @@ window#waybar.hidden {
     }
 }
 
-window#waybar #clock {
+#clock {
     margin-top: 3px;
     margin-left: 8px;
     padding-left: 10px;
@@ -113,10 +113,10 @@ window#waybar #clock {
     border-radius: 10px;
     transition: none;
     color: #161320;
-    background: #F8BD96;
+    background: #F8BD96 !important;
 }
 
-window#waybar #clock-date {
+#clock-date {
     margin-top: 3px;
     margin-left: 8px;
     padding-left: 10px;
@@ -125,7 +125,7 @@ window#waybar #clock-date {
     border-radius: 10px;
     transition: none;
     color: #161320;
-    background: #ABE9B3;
+    background: #ABE9B3 !important;
 }
 
 #memory {
