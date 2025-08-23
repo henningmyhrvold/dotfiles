@@ -134,3 +134,8 @@ fi
 
 export EDITOR=nvim
 export XDG_SESSION_TYPE=wayland
+
+# fzf integration 
+if [[ -x /usr/bin/fzf ]]; then
+  source <(fzf --zsh)
+fi
