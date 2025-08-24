@@ -105,5 +105,5 @@
         "exec": "~/.config/waybar/email_unread.sh",
         "interval": 60,
         "tooltip": false
-    },
+    }
 }
