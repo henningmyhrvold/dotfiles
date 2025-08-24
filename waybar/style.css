@@ -6,12 +6,12 @@
     min-height: 10px;
 }
 
-window#waybar {
+window#_objs_waybar {
     background: rgba(0, 0, 0, 0.77);
     border-radius: 0;
 }
 
-window#waybar.hidden {
+window#_objs_waybar.hidden {
     opacity: 0.2;
 }
 
@@ -203,6 +203,18 @@ window#waybar.hidden {
     transition: none;
     color: #161320;
     background: #E8A2AF;
+}
+
+#custom-email {
+    margin-top: 3px;
+    margin-left: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 3px;
+    border-radius: 10px;
+    transition: none;
+    color: #161320;
+    background: #F28FAD;
 }
 
 #custom-disk {
