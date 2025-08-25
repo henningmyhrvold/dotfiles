@@ -288,3 +288,15 @@ window#waybar.hidden {
     color: #161320;
     background: #F28FAD;
 }
+
+#custom-meetings {
+    margin-top: 3px;
+    margin-left: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 3px;
+    border-radius: 10px;
+    transition: none;
+    color: #161320;
+    background: #ABE9B3;
+}

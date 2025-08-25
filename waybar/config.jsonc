@@ -1,7 +1,7 @@
 {
 	"layer": "top",
 	"height": 28,
-	"modules-left": ["custom/launcher","battery","clock#date","clock#time","custom/updates", "custom/email"],
+	"modules-left": ["custom/launcher","battery","clock#date","clock#time","custom/updates", "custom/email", "custom/meetings"],
 	"modules-center": ["hyprland/workspaces"],
 	"modules-right": ["custom/disk","cpu","memory","temperature","network","hyprland/language","pulseaudio","custom/power"], 
 	
@@ -103,6 +103,12 @@
     "custom/email": {
         "format": "  {}",
         "exec": "~/.config/waybar/email_unread.sh",
+        "interval": 60,
+        "tooltip": false
+    },
+        "custom/meetings": {
+        "format": "  {}",
+        "exec": "~/.config/waybar/meetings.sh",
         "interval": 60,
         "tooltip": false
     }
