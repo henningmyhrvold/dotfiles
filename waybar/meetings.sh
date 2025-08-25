@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Detect the default Thunderbird profile
-PROFILE=$(sed -n '/\[Profile0\]/,/^$/p' ~/.thunderbird/profiles.ini | grep 'Path=' | cut -d= -f2)
+PROFILE=$(sed -n '/\[hotmail\]/,/^$/p' ~/.thunderbird/profiles.ini | grep 'Path=' | cut -d= -f2)
+#PROFILE=$(sed -ne 's/^Default=//p' ~/.thunderbird/profiles.ini)
 
 # Path to the calendar database
 DB="$HOME/.thunderbird/$PROFILE/calendar-data/local.sqlite"
@@ -43,4 +44,4 @@ if [ -z "$NEXT" ]; then
 fi
 
 # Output in the desired format
-echo "($NEXT | $TOTAL)"
+echo "$NEXT | $TOTAL"
