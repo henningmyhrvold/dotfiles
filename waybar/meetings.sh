@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Detect the default Thunderbird profile
-PROFILE=$(sed -n '/\[hotmail\]/,/^$/p' ~/.thunderbird/profiles.ini | grep 'Path=' | cut -d= -f2)
-#PROFILE=$(sed -ne 's/^Default=//p' ~/.thunderbird/profiles.ini)
+PROFILE=$(sed -ne 's/^Default=//p' ~/.thunderbird/profiles.ini)
 
 # Path to the calendar database
 DB="$HOME/.thunderbird/$PROFILE/calendar-data/local.sqlite"
@@ -18,7 +17,7 @@ ORDER BY event_start;
 
 # If no events, output default
 if [ -z "$EVENT_STARTS" ]; then
-    echo "(-- | 0)"
+    echo "-- | 0"
     exit 0
 fi
 
