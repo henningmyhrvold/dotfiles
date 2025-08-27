@@ -2,10 +2,11 @@ import os
 import re
 from datetime import datetime, timedelta
 from dateutil.rrule import rrulestr
+from dateutil.tz import gettz, tzlocal
 import sqlite3
 
 # Detect the default Thunderbird profile
-home = os.expanduser('~')
+home = os.path.expanduser('~')
 profiles_ini = os.path.join(home, '.thunderbird', 'profiles.ini')
 with open(profiles_ini, 'r') as f:
     content = f.read()
@@ -51,10 +52,12 @@ DB = os.path.join(home, '.thunderbird', PROFILE, 'calendar-data', 'local.sqlite'
 conn = sqlite3.connect(DB)
 cur = conn.cursor()
 
-# Get today's start and end in local time
-today = datetime.now().date()
-start_of_day = datetime.combine(today, datetime.min.time())
-end_of_day = datetime.combine(today + timedelta(days=1), datetime.min.time()) - timedelta(seconds=1)
+# Get today's start and end in local time, aware
+local_tz = tzlocal()
+now = datetime.now(local_tz)
+today = now.date()
+start_of_day = datetime.combine(today, datetime.min.time()).replace(tzinfo=local_tz)
+end_of_day = start_of_day + timedelta(days=1) - timedelta(seconds=1)
 start_of_day_s = int(start_of_day.timestamp())
 end_of_day_s = int(end_of_day.timestamp())
 
@@ -68,12 +71,16 @@ WHERE (e.event_end / 1000000 > ? OR e.event_end IS NULL) AND (e.event_start / 10
 
 events = cur.fetchall()
 
-# Collect all instance start times in local time
+# Collect all instance start times
 instance_starts = []
 for event in events:
-    _, _, start_s, end_s, rrule_str, _ = event
-    start_dt = datetime.fromtimestamp(start_s)  # Converts UTC seconds to local datetime
-    end_dt = datetime.fromtimestamp(end_s) if end_s is not None else None
+    event_id, cal_id, start_s, end_s, rrule_str, start_tz_str = event
+    if start_tz_str is None or start_tz_str == 'floating':
+        tzinfo = local_tz
+    else:
+        tzinfo = gettz(start_tz_str) or local_tz  # Fallback if invalid
+    start_dt = datetime.fromtimestamp(start_s, tz=tzinfo)
+    end_dt = datetime.fromtimestamp(end_s, tz=tzinfo) if end_s is not None else None
     if rrule_str is None:
         # Non-recurring
         if start_of_day <= start_dt <= end_of_day:
@@ -81,7 +88,6 @@ for event in events:
     else:
         # Recurring
         rrule = rrulestr(rrule_str, dtstart=start_dt)
-        # Get instances within today
         instances = rrule.between(start_of_day, end_of_day, inc=True)
         if end_dt is not None:
             instances = [inst for inst in instances if inst <= end_dt]
@@ -94,9 +100,6 @@ instance_starts.sort()
 
 # Count total
 total = len(instance_starts)
-
-# Current time
-now = datetime.now()
 
 # Find next
 next_time = "--"
