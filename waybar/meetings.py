@@ -15,25 +15,17 @@ except ImportError:
     print(json.dumps({"text": "Error", "tooltip": "python-dateutil not installed"}))
     exit(1)
 
-# ===================================================================
-# THIS FUNCTION HAS BEEN REPLACED WITH A MORE RELIABLE VERSION
-# ===================================================================
 def find_thunderbird_profile():
     """Finds the default Thunderbird profile path using a more robust method."""
     profiles_ini_path = os.path.expanduser('~/.thunderbird/profiles.ini')
     if not os.path.exists(profiles_ini_path):
         return None
-
     config = configparser.ConfigParser()
     config.read(profiles_ini_path)
-
-    # Store all available profiles by their path for easy lookup
     profile_path_map = {}
     for section in config.sections():
         if section.startswith('Profile') and 'Path' in config[section]:
             profile_path_map[config[section]['Path']] = section
-
-    # Priority 1: Check the [Install] section, which is the most reliable source.
     for section in config.sections():
         if section.startswith('Install') and 'Default' in config[section]:
             default_path_key = config[section]['Default']
@@ -44,8 +36,6 @@ def find_thunderbird_profile():
                 if is_relative:
                     return os.path.join(os.path.dirname(profiles_ini_path), path)
                 return path
-
-    # Fallback (Priority 2): Find a profile with the 'Default=1' flag.
     for section in config.sections():
         if section.startswith('Profile') and config.getboolean(section, 'Default', fallback=False):
             path = config[section]['Path']
@@ -53,26 +43,22 @@ def find_thunderbird_profile():
             if is_relative:
                 return os.path.join(os.path.dirname(profiles_ini_path), path)
             return path
-
-    return None # If no profile is found
+    return None
 
 def get_meetings():
-    """
-    Connects to the Thunderbird calendar DB, fetches today's meetings,
-    and returns the next meeting time and total count.
-    """
     profile_path = find_thunderbird_profile()
     if not profile_path:
         return "--", 0, "Profile not found"
 
-    # IMPORTANT: You may still need to change 'local.sqlite' below if you use
-    # a synced calendar. First, see if this script works. If not, check
-    # the contents of the calendar-data directory as described previously.
-    db_path = os.path.join(profile_path, 'calendar-data', 'local.sqlite')
-    
+    # ===================================================================
+    # ▼▼▼ CHANGE THIS FILENAME ▼▼▼
+    # Replace 'local.sqlite' with the large .sqlite file you found in Step 1.
+    db_filename = "local.sqlite-wal"
+    # ===================================================================
+
+    db_path = os.path.join(profile_path, 'calendar-data', db_filename)
     if not os.path.exists(db_path):
-        # This error now also tells you which directory it checked
-        return "--", 0, f"DB not found in {os.path.dirname(db_path)}"
+        return "--", 0, f"DB '{db_filename}' not found"
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_db_path = os.path.join(tmpdir, 'db.sqlite')
@@ -84,15 +70,22 @@ def get_meetings():
         conn = sqlite3.connect(tmp_db_path)
         cur = conn.cursor()
 
+        exceptions = set()
+        try:
+            cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cal_exceptions'")
+            if cur.fetchone():
+                cur.execute("SELECT cal_id, recurrence_id FROM cal_exceptions WHERE is_negative = 1")
+                exceptions = { (row[0], row[1]) for row in cur.fetchall() }
+        except sqlite3.Error:
+            # If there's an error, just proceed with an empty exceptions list.
+            pass
+
         local_tz = tzlocal()
         now_local = datetime.now(local_tz)
         start_of_day_local = datetime.combine(now_local.date(), time.min, tzinfo=local_tz)
         end_of_day_local = datetime.combine(now_local.date(), time.max, tzinfo=local_tz)
         start_of_day_utc_ts = int(start_of_day_local.astimezone(timezone.utc).timestamp() * 1_000_000)
-
-        cur.execute("SELECT cal_id, recurrence_id FROM cal_exceptions WHERE is_negative = 1")
-        exceptions = { (row[0], row[1]) for row in cur.fetchall() }
-
+        
         cur.execute("""
             SELECT e.id, e.cal_id, e.event_start, e.event_start_tz, p.value AS rrule
             FROM cal_events e
@@ -128,7 +121,6 @@ def get_meetings():
         return "--", 0, None
 
     todays_meetings.sort()
-    
     total = len(todays_meetings)
     next_meeting_time = "--"
     
@@ -141,15 +133,12 @@ def get_meetings():
 
 if __name__ == "__main__":
     next_time, total_count, error_msg = get_meetings()
-    
     output = {
         "text": f"({next_time} | {total_count})",
         "tooltip": f"Next meeting: {next_time}\nTotal today: {total_count}",
         "class": "meetings"
     }
-    
     if error_msg:
         output["text"] = "(-- | 0)"
         output["tooltip"] = f"Error: {error_msg}"
-
     print(json.dumps(output))
