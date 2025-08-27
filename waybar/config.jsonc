@@ -108,7 +108,7 @@
     },
         "custom/meetings": {
         "format": "  {}",
-        "exec": "~/.config/waybar/meetings.sh",
+        "exec": "python ~/.config/waybar/meetings.py",
         "interval": 60,
         "tooltip": false
     }
