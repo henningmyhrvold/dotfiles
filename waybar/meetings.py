@@ -1,119 +1,149 @@
+#!/usr/bin/env python3
+
 import os
-import re
+import sqlite3
 import shutil
 import tempfile
-from datetime import datetime, timedelta
-from dateutil.rrule import rrulestr
-from dateutil.tz import gettz, tzlocal
-import sqlite3
+import json
+import configparser
+from datetime import datetime, time, timezone
 
-# Detect the default Thunderbird profile
-home = os.path.expanduser('~')
-profiles_ini = os.path.join(home, '.thunderbird', 'profiles.ini')
-with open(profiles_ini, 'r') as f:
-    content = f.read()
+# Make sure you have python-dateutil installed:
+# pip install python-dateutil
+try:
+    from dateutil.rrule import rrulestr
+    from dateutil.tz import gettz, tzlocal
+except ImportError:
+    print("Error: python-dateutil is not installed. Please run 'pip install python-dateutil'")
+    exit(1)
 
-default_path = ''
-install_default = ''
-in_install = False
-in_profile = False
-is_default = False
-path = ''
-for line in content.splitlines():
-    if line.startswith('[Install'):
-        in_install = True
-        in_profile = False
-    elif line.startswith('[Profile'):
-        in_profile = True
-        in_install = False
-        path = ''
-        is_default = False
-    elif line.startswith('['):
-        if in_profile and is_default:
-            default_path = path
-        in_profile = False
-        in_install = False
-    if line.startswith('Default='):
-        value = line.split('=')[1].strip()
-        if in_install:
-            install_default = value
-        elif in_profile:
-            if value == '1':
-                is_default = True
-    if line.startswith('Path='):
-        if in_profile:
-            path = line.split('=')[1].strip()
-if in_profile and is_default:
-    default_path = path
-PROFILE = install_default if install_default else default_path
+def find_thunderbird_profile():
+    """Finds the default Thunderbird profile path."""
+    profiles_ini_path = os.path.expanduser('~/.thunderbird/profiles.ini')
+    if not os.path.exists(profiles_ini_path):
+        return None
 
-# Path to the calendar database
-DB = os.path.join(home, '.thunderbird', PROFILE, 'calendar-data', 'local.sqlite')
+    config = configparser.ConfigParser()
+    config.read(profiles_ini_path)
 
-# Create a temporary copy of the database to avoid lock issues
-with tempfile.TemporaryDirectory() as tmpdir:
-    tmp_db = os.path.join(tmpdir, 'local.sqlite')
-    shutil.copy(DB, tmp_db)
+    for section in config.sections():
+        if section.startswith('Profile') and config.getboolean(section, 'Default', fallback=False):
+            is_relative = config.getint(section, 'IsRelative', fallback=1)
+            path = config.get(section, 'Path')
+            if is_relative:
+                return os.path.join(os.path.dirname(profiles_ini_path), path)
+            return path
+    return None
 
-    # Connect to the temporary database copy
-    conn = sqlite3.connect(tmp_db)
-    cur = conn.cursor()
+def get_meetings():
+    """
+    Connects to the Thunderbird calendar DB, fetches today's meetings,
+    and returns the next meeting time and total count.
+    """
+    profile_path = find_thunderbird_profile()
+    if not profile_path:
+        return "--", 0, "Profile not found"
 
-    # Get today's start and end in local time, aware
-    local_tz = tzlocal()
-    now = datetime.now(local_tz)
-    today = now.date()
-    start_of_day = datetime.combine(today, datetime.min.time()).replace(tzinfo=local_tz)
-    end_of_day = start_of_day + timedelta(days=1) - timedelta(seconds=1)
-    start_of_day_s = int(start_of_day.timestamp())
-    end_of_day_s = int(end_of_day.timestamp())
+    db_path = os.path.join(profile_path, 'calendar-data', 'local.sqlite')
+    if not os.path.exists(db_path):
+        return "--", 0, "DB not found"
 
-    # Query for events that could overlap today, including recurring
-    cur.execute("""
-    SELECT e.id, e.cal_id, e.event_start / 1000000, e.event_end / 1000000, p.value, e.event_start_tz
-    FROM cal_events e
-    LEFT JOIN cal_properties p ON p.key = 'RRULE' AND p.item_id = e.id AND p.cal_id = e.cal_id
-    WHERE (e.event_end / 1000000 > ? OR e.event_end IS NULL) AND (e.event_start / 1000000 < ? + 86400)
-    """, (start_of_day_s, start_of_day_s))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Copy DB to a temp location to avoid "database is locked" errors
+        tmp_db_path = os.path.join(tmpdir, 'local.sqlite')
+        try:
+            shutil.copy2(db_path, tmp_db_path)
+        except FileNotFoundError:
+             return "--", 0, "DB not found"
 
-    events = cur.fetchall()
+        conn = sqlite3.connect(tmp_db_path)
+        cur = conn.cursor()
 
-    # Collect all instance start times
-    instance_starts = []
-    for event in events:
-        event_id, cal_id, start_s, end_s, rrule_str, start_tz_str = event
-        if start_tz_str is None or start_tz_str == 'floating':
-            tzinfo = local_tz
+        # Get today's date range in local time, then convert to UTC for queries
+        local_tz = tzlocal()
+        now_local = datetime.now(local_tz)
+        start_of_day_local = datetime.combine(now_local.date(), time.min, tzinfo=local_tz)
+        end_of_day_local = datetime.combine(now_local.date(), time.max, tzinfo=local_tz)
+
+        # Timestamps are stored in microseconds UTC
+        start_of_day_utc_ts = int(start_of_day_local.astimezone(timezone.utc).timestamp() * 1_000_000)
+        end_of_day_utc_ts = int(end_of_day_local.astimezone(timezone.utc).timestamp() * 1_000_000)
+
+        # 1. Get exceptions (deleted instances of recurring events) for today
+        cur.execute("""
+            SELECT cal_id, recurrence_id
+            FROM cal_exceptions
+            WHERE is_negative = 1
+        """)
+        exceptions = { (row[0], row[1]) for row in cur.fetchall() }
+
+        # 2. Get all events that could possibly occur today
+        cur.execute("""
+            SELECT
+                e.id, e.cal_id, e.event_start, e.event_start_tz,
+                p.value AS rrule
+            FROM cal_events e
+            LEFT JOIN cal_properties p ON p.item_id = e.id AND p.key = 'RRULE'
+            WHERE
+                e.event_end > ? OR e.event_end IS NULL
+        """, (start_of_day_utc_ts,))
+        
+        events = cur.fetchall()
+        conn.close()
+
+    todays_meetings = []
+    for event_id, cal_id, start_ts, tz_str, rrule_str in events:
+        try:
+            event_tz = gettz(tz_str) or local_tz
+            # dtstart needs to be aware for rrulestr
+            dtstart = datetime.fromtimestamp(start_ts / 1_000_000, tz=event_tz)
+        except Exception:
+            continue # Skip events with invalid data
+
+        if rrule_str:
+            # It's a recurring event
+            try:
+                rule = rrulestr(rrule_str, dtstart=dtstart)
+                # Generate instances between today's start and end
+                for instance in rule.between(start_of_day_local, end_of_day_local, inc=True):
+                    # Check if this instance was deleted
+                    instance_utc_ts = int(instance.astimezone(timezone.utc).timestamp() * 1_000_000)
+                    if (cal_id, instance_utc_ts) not in exceptions:
+                        todays_meetings.append(instance.astimezone(local_tz))
+            except (ValueError, TypeError):
+                # rrulestr can fail on complex rules; skip them
+                continue
         else:
-            tzinfo = gettz(start_tz_str) or local_tz  # Fallback if invalid
-        start_dt = datetime.fromtimestamp(start_s, tz=tzinfo)
-        end_dt = datetime.fromtimestamp(end_s, tz=tzinfo) if end_s is not None else None
-        if rrule_str is None:
-            # Non-recurring
-            if start_of_day <= start_dt <= end_of_day:
-                instance_starts.append(start_dt)
-        else:
-            # Recurring
-            rrule = rrulestr(rrule_str, dtstart=start_dt)
-            instances = rrule.between(start_of_day, end_of_day, inc=True)
-            if end_dt is not None:
-                instances = [inst for inst in instances if inst <= end_dt]
-            instance_starts.extend(instances)
+            # It's a single, non-recurring event
+            if start_of_day_local <= dtstart <= end_of_day_local:
+                todays_meetings.append(dtstart.astimezone(local_tz))
 
-    conn.close()
+    if not todays_meetings:
+        return "--", 0, None
 
-# Sort the instances
-instance_starts.sort()
+    todays_meetings.sort()
+    
+    total = len(todays_meetings)
+    next_meeting_time = "--"
+    
+    for meeting in todays_meetings:
+        if meeting >= now_local:
+            next_meeting_time = meeting.strftime("%H:%M")
+            break
 
-# Count total
-total = len(instance_starts)
+    return next_meeting_time, total, None
 
-# Find next
-next_time = "--"
-for inst in instance_starts:
-    if inst >= now:
-        next_time = inst.strftime("%H:%M")
-        break
+if __name__ == "__main__":
+    next_time, total_count, error_msg = get_meetings()
+    
+    output = {
+        "text": f"({next_time} | {total_count})",
+        "tooltip": f"Next meeting: {next_time}\nTotal today: {total_count}",
+        "class": "meetings"
+    }
+    
+    if error_msg:
+        output["text"] = "(-- | 0)"
+        output["tooltip"] = f"Error: {error_msg}"
 
-# Output
-print(f"({next_time} | {total})")
+    print(json.dumps(output))

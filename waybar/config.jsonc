@@ -101,15 +101,16 @@
         "on-click": "hyprctl switchxkblayout next"
     },
     "custom/email": {
-        "format": "  {}",
+        "format": "    {}",
         "exec": "~/.config/waybar/email_unread.sh",
         "interval": 60,
         "tooltip": false
     },
-        "custom/meetings": {
-        "format": "  {}",
-        "exec": "python ~/.config/waybar/meetings.py",
+    "custom/meetings": {
+        "format": " {}",
+        "exec": "~/.config/waybar/scripts/thunderbird_meetings.py",
+        "return-type": "json",
         "interval": 60,
-        "tooltip": false
-    }
+        "tooltip": true
+     }
 }
