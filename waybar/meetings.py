@@ -18,14 +18,12 @@ except ImportError:
     exit(1)
 
 def find_thunderbird_profile():
-    """Finds the default Thunderbird profile path."""
+    # ... (this function remains exactly the same) ...
     profiles_ini_path = os.path.expanduser('~/.thunderbird/profiles.ini')
     if not os.path.exists(profiles_ini_path):
         return None
-
     config = configparser.ConfigParser()
     config.read(profiles_ini_path)
-
     for section in config.sections():
         if section.startswith('Profile') and config.getboolean(section, 'Default', fallback=False):
             is_relative = config.getint(section, 'IsRelative', fallback=1)
@@ -34,6 +32,17 @@ def find_thunderbird_profile():
                 return os.path.join(os.path.dirname(profiles_ini_path), path)
             return path
     return None
+
+
+profile_path = find_thunderbird_profile()
+# ADDED THIS LINE FOR DEBUGGING:
+print(f"DEBUG: Found profile path -> {profile_path}")
+
+if profile_path:
+    db_path = os.path.join(profile_path, 'calendar-data', 'local.sqlite')
+    # ADDED THIS LINE FOR DEBUGGING:
+    print(f"DEBUG: Checking for DB at -> {db_path}")
+
 
 def get_meetings():
     """
