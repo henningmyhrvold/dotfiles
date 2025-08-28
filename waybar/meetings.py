@@ -2,9 +2,11 @@
 # Waybar meetings module for Thunderbird calendars
 # - Detects default TB profile
 # - Reads calendar SQLite snapshot safely (incl. WAL/SHM)
-# - Handles recurring events (RRULE) and exceptions
-# - Counts events that start OR overlap today
+# - Auto-detects timestamp units (us/ms/s)
+# - Handles recurring events (RRULE) and negative exceptions
+# - Counts events that start OR overlap today (incl. all-day)
 # - Outputs: {"text": "HH:MM | N", "tooltip": "...", "class": "meetings"}
+# Set DEBUG=1 in the environment to get extra details in tooltip.
 
 import os
 import sqlite3
@@ -21,7 +23,24 @@ except ImportError:
     print(json.dumps({"text": "Error", "tooltip": "python-dateutil not installed"}))
     raise SystemExit(1)
 
-MICROSECOND = 1_000_000  # Your DB uses microseconds since epoch (16 digits)
+def detect_unit(conn) -> int:
+    """Return epoch unit factor (1 for seconds, 1000 for ms, 1_000_000 for us)."""
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(event_start) FROM cal_events WHERE event_start IS NOT NULL")
+        val = cur.fetchone()[0]
+        if val is None:
+            return 1_000_000  # default to us if empty
+        v = abs(int(val))
+        if v >= 10**15:  # ~microseconds
+            return 1_000_000
+        if v >= 10**12:  # ~milliseconds
+            return 1_000
+        if v >= 10**9:   # ~seconds
+            return 1
+        return 1_000_000
+    except Exception:
+        return 1_000_000
 
 def find_thunderbird_profile():
     """Find the default Thunderbird profile path using profiles.ini."""
@@ -59,23 +78,38 @@ def find_thunderbird_profile():
 
     return None
 
+def to_epoch(dt: datetime, factor: int) -> int:
+    return int(dt.timestamp() * factor)
+
+def from_epoch(ts: int, factor: int, tzinfo) -> datetime | None:
+    try:
+        return datetime.fromtimestamp(int(ts) / factor, tz=tzinfo)
+    except Exception:
+        return None
+
 def get_meetings():
+    debug = os.environ.get("DEBUG") == "1"
+
     profile_path = find_thunderbird_profile()
     if not profile_path:
-        return "--", 0, "Profile not found"
+        return "--", 0, "Profile not found", "debug: no profile"
 
-    # Set the calendar DB filename found in your profile
-    db_filename = "local.sqlite"  # Confirmed largest
+    # Pick the calendar DB (you said 'local.sqlite' is the largest)
+    db_filename = "local.sqlite"
     db_path = os.path.join(profile_path, 'calendar-data', db_filename)
     if not os.path.exists(db_path):
-        return "--", 0, f"DB '{db_filename}' not found"
+        return "--", 0, f"DB '{db_filename}' not found", f"debug: looked in {os.path.dirname(db_path)}"
 
     # Local timezone and today's boundaries
     local_tz = tzlocal()
     now_local = datetime.now(local_tz)
-    start_of_day_local = datetime.combine(now_local.date(), time.min, tzinfo=local_tz)
-    end_of_day_local = datetime.combine(now_local.date(), time.max, tzinfo=local_tz)
-    start_of_day_utc_ts = int(start_of_day_local.astimezone(timezone.utc).timestamp() * MICROSECOND)
+    sod_local = datetime.combine(now_local.date(), time.min, tzinfo=local_tz)
+    eod_local = datetime.combine(now_local.date(), time.max, tzinfo=local_tz)
+
+    scanned = 0
+    recurrences_seen = 0
+    singles_seen = 0
+    unit = None
 
     # Snapshot DB (copy base + WAL/SHM if present), then open read-only with a small timeout
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -87,16 +121,19 @@ def get_meetings():
                 if os.path.exists(side):
                     shutil.copy2(side, tmp_db_path + ext)
         except Exception as e:
-            return "--", 0, f"DB copy failed: {e}"
+            return "--", 0, f"DB copy failed: {e}", f"debug: src={db_path}"
 
         try:
             conn = sqlite3.connect(f"file:{tmp_db_path}?mode=ro", uri=True, timeout=2.0)
             conn.execute("PRAGMA busy_timeout=2000")
             cur = conn.cursor()
         except sqlite3.Error as e:
-            return "--", 0, f"DB open failed: {e}"
+            return "--", 0, f"DB open failed: {e}", None
 
-        # Collect negative exceptions (cancelled instances) if table exists
+        # Determine epoch unit from the data
+        unit = detect_unit(conn)
+
+        # Exceptions: cancelled instances (if table exists)
         exceptions = set()
         try:
             cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cal_exceptions'")
@@ -106,7 +143,7 @@ def get_meetings():
         except sqlite3.Error:
             pass  # Missing table is fine
 
-        # Key fix: include recurring masters even if their first event_end is in the past.
+        # IMPORTANT: no WHERE filter — fetch everything and filter in Python.
         try:
             cur.execute("""
                 SELECT e.id,
@@ -118,71 +155,84 @@ def get_meetings():
                 FROM cal_events e
                 LEFT JOIN cal_properties p
                        ON p.item_id = e.id AND p.key = 'RRULE'
-                WHERE (e.event_end > ? OR e.event_end IS NULL)  -- upcoming or open-ended
-                   OR p.value IS NOT NULL                       -- ALWAYS include recurring masters
-            """, (start_of_day_utc_ts,))
+            """)
             events = cur.fetchall()
         except sqlite3.Error as e:
             conn.close()
-            return "--", 0, f"Query failed: {e}"
+            return "--", 0, f"Query failed: {e}", None
 
         conn.close()
 
     # Expand/collect today's instances
-    todays_meetings = []
+    todays = []
     for event_id, cal_id, start_ts, end_ts, tz_str, rrule_str in events:
-        try:
-            event_tz = gettz(tz_str) or local_tz
-            # TB stores microseconds since epoch; interpret as event_tz for consistency with stored tz
-            dtstart = datetime.fromtimestamp(start_ts / MICROSECOND, tz=event_tz)
-            dtend = (datetime.fromtimestamp(end_ts / MICROSECOND, tz=event_tz)
-                     if end_ts is not None else None)
-        except Exception:
-            continue  # Skip malformed rows
+        scanned += 1
+        event_tz = gettz(tz_str) or local_tz
+
+        dtstart = from_epoch(start_ts, unit, event_tz)
+        dtend = from_epoch(end_ts, unit, event_tz) if end_ts is not None else None
+        if dtstart is None:
+            continue
 
         if rrule_str:
-            # Recurring: expand into today
+            recurrences_seen += 1
             try:
                 rule = rrulestr(rrule_str, dtstart=dtstart)
-                for instance in rule.between(start_of_day_local, end_of_day_local, inc=True):
-                    # Build the recurrence_id in microseconds UTC to match exceptions table
-                    instance_utc_ts = int(instance.astimezone(timezone.utc).timestamp() * MICROSECOND)
-                    if (cal_id, instance_utc_ts) not in exceptions:
-                        todays_meetings.append(instance.astimezone(local_tz))
-            except (ValueError, TypeError):
-                continue
+                for inst in rule.between(sod_local, eod_local, inc=True):
+                    inst_utc = to_epoch(inst.astimezone(timezone.utc), unit)
+                    if (cal_id, inst_utc) not in exceptions:
+                        todays.append(inst.astimezone(local_tz))
+            except Exception:
+                # If RRULE parsing fails, at least consider the base start
+                if sod_local <= dtstart.astimezone(local_tz) <= eod_local:
+                    todays.append(dtstart.astimezone(local_tz))
         else:
-            # Single event: include if starts today OR overlaps today
-            starts_today = start_of_day_local <= dtstart <= end_of_day_local
+            singles_seen += 1
+            # Single event: include if starts today OR overlaps today (covers all-day)
+            starts_today = sod_local <= dtstart.astimezone(local_tz) <= eod_local
             overlaps_today = (dtend is not None and
-                              dtstart <= end_of_day_local and dtend >= start_of_day_local)
+                              dtstart.astimezone(local_tz) <= eod_local and
+                              dtend.astimezone(local_tz) >= sod_local)
             if starts_today or overlaps_today:
-                todays_meetings.append(dtstart.astimezone(local_tz))
+                todays.append(dtstart.astimezone(local_tz))
 
-    if not todays_meetings:
-        return "--", 0, None
+    if not todays:
+        dbg = None
+        if debug:
+            dbg = (f"unit={unit} scanned={scanned} recurrences={recurrences_seen} "
+                   f"singles={singles_seen} db={db_path}")
+        return "--", 0, None, dbg
 
-    todays_meetings.sort()
-    total = len(todays_meetings)
+    todays.sort()
+    total = len(todays)
 
     # Next meeting at/after now; if none left, keep "--"
-    next_meeting_time = "--"
-    for meeting in todays_meetings:
-        if meeting >= now_local:
-            next_meeting_time = meeting.strftime("%H:%M")
+    next_meeting = "--"
+    for t in todays:
+        if t >= now_local:
+            next_meeting = t.strftime("%H:%M")
             break
 
-    return next_meeting_time, total, None
+    dbg = None
+    if debug:
+        first = todays[0].strftime("%H:%M") if todays else "--"
+        last = todays[-1].strftime("%H:%M") if todays else "--"
+        dbg = (f"unit={unit} scanned={scanned} recurrences={recurrences_seen} "
+               f"singles={singles_seen} first={first} last={last} db={db_path}")
+
+    return next_meeting, total, None, dbg
 
 if __name__ == "__main__":
-    next_time, total_count, error_msg = get_meetings()
-    output = {
-        "text": f"{next_time} | {total_count}",
-        "tooltip": f"Next meeting: {next_time}\nTotal today: {total_count}",
-        "class": "meetings",
-    }
+    next_time, total_count, error_msg, debug_info = get_meetings()
+    tooltip_lines = []
     if error_msg:
-        output["text"] = "-- | 0"
-        output["tooltip"] = f"Error: {error_msg}"
-    print(json.dumps(output))
+        text = "-- | 0"
+        tooltip_lines.append(f"Error: {error_msg}")
+    else:
+        text = f"{next_time} | {total_count}"
+        tooltip_lines.append(f"Next meeting: {next_time}")
+        tooltip_lines.append(f"Total today: {total_count}")
+    if debug_info:
+        tooltip_lines.append(debug_info)
+    print(json.dumps({"text": text, "tooltip": "\n".join(tooltip_lines), "class": "meetings"}))
 
