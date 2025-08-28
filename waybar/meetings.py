@@ -106,7 +106,7 @@ def snapshot_sqlite(db_path, tmpdir):
 
 def open_ro(path):
     """Open an SQLite DB in read-only URI mode with a small busy timeout."""
-    conn = sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=2.0)
+    conn = sqlite3.connect("file:{0}?mode=ro".format(path), uri=True, timeout=2.0)
     conn.execute("PRAGMA busy_timeout=2000")
     return conn
 
@@ -131,10 +131,10 @@ def detect_unit(conn):
     except Exception:
         return 1_000_000
 
-def to_epoch(dt: datetime, factor: int) -> int:
+def to_epoch(dt, factor):
     return int(dt.timestamp() * factor)
 
-def from_epoch(ts: int, factor: int, tzinfo):
+def from_epoch(ts, factor, tzinfo):
     try:
         return datetime.fromtimestamp(int(ts) / factor, tz=tzinfo)
     except Exception:
@@ -151,7 +151,7 @@ def get_meetings():
 
     candidates = list_candidate_sqlites(profile_path)
     if not candidates:
-        return "--", 0, "No .sqlite candidates found", f"debug: searched {profile_path}"
+        return "--", 0, "No .sqlite candidates found", "debug: searched {0}".format(profile_path)
 
     local_tz = tzlocal()
     now_local = datetime.now(local_tz)
@@ -172,12 +172,12 @@ def get_meetings():
                 snap = snapshot_sqlite(db, tmpdir)
                 conn = open_ro(snap)
             except Exception as e:
-                scanned_summary.append(f"{os.path.basename(db)}: open-failed:{e}")
+                scanned_summary.append("{0}: open-failed:{1}".format(os.path.basename(db), e))
                 continue
 
             try:
                 if not has_cal_events(conn):
-                    scanned_summary.append(f"{os.path.basename(db)}: no cal_events")
+                    scanned_summary.append("{0}: no cal_events".format(os.path.basename(db)))
                     conn.close()
                     continue
 
@@ -210,7 +210,7 @@ def get_meetings():
                 conn.close()
 
                 if not rows:
-                    scanned_summary.append(f"{os.path.basename(db)}: 0 rows")
+                    scanned_summary.append("{0}: 0 rows".format(os.path.basename(db)))
                     continue
 
                 scanned = 0
@@ -275,6 +275,7 @@ def get_meetings():
                     starts = sorted(
                         [from_epoch(r[2], unit, local_tz) for r in rows if r[2] is not None]
                     )
+                    starts = [s for s in starts if s is not None]
                     if starts:
                         first_dt = starts[0].strftime("%Y-%m-%d")
                         last_dt = starts[-1].strftime("%Y-%m-%d")
@@ -282,8 +283,9 @@ def get_meetings():
                     pass
 
                 scanned_summary.append(
-                    f"{os.path.basename(db)}: unit={unit} rows={len(rows)} "
-                    f"recur={recur} single={single} first={first_dt} last={last_dt}"
+                    "{0}: unit={1} rows={2} recur={3} single={4} first={5} last={6}".format(
+                        os.path.basename(db), unit, len(rows), recur, single, first_dt, last_dt
+                    )
                 )
 
             except Exception as e:
@@ -291,13 +293,62 @@ def get_meetings():
                     conn.close()
                 except Exception:
                     pass
-                scanned_summary.append(f"{os.path.basename(db)}: error:{e}")
+                scanned_summary.append("{0}: error:{1}".format(os.path.basename(db), e))
                 continue
 
     if not todays_instances:
         dbg = None
         if debug_on:
             used = ", ".join(sorted({os.path.basename(p) for p in used_dbs})) or "none"
-            dbg = ("; ".join(scanned_summary) +
-                   f" | today=0 used
+            dbg = "; ".join(scanned_summary) + \
+                  " | today=0 used_dbs=[{0}] total_scanned={1} recur={2} single={3}".format(
+                      used, total_scanned, total_recur, total_single
+                  )
+        return "--", 0, None, dbg
+
+    # Sort by start time
+    todays_instances.sort(key=lambda t: t[0])
+
+    # Compute "meetings left": events whose END >= now.
+    # If an event has no end, we treat it as remaining only if it hasn't started yet.
+    now_local = datetime.now(tzlocal())
+    left_instances = [
+        (s, e) for (s, e) in todays_instances
+        if (e is not None and e >= now_local) or (e is None and s >= now_local)
+    ]
+    left_count = len(left_instances)
+
+    # Next meeting time = next start >= now (ignores ongoing)
+    next_meeting_time = "--"
+    for start_local, _end_local in todays_instances:
+        if start_local >= now_local:
+            next_meeting_time = start_local.strftime("%H:%M")
+            break
+
+    dbg = None
+    if debug_on:
+        used = ", ".join(sorted({os.path.basename(p) for p in used_dbs}))
+        first = todays_instances[0][0].strftime("%H:%M")
+        last = todays_instances[-1][0].strftime("%H:%M")
+        dbg = "today={0} left={1} used_dbs=[{2}] total_scanned={3} recur={4} single={5} first={6} last={7}".format(
+            len(todays_instances), left_count, used, total_scanned, total_recur, total_single, first, last
+        )
+
+    return next_meeting_time, left_count, None, dbg
+
+# ---------- Main ----------
+
+if __name__ == "__main__":
+    next_time, left_count, error_msg, debug_info = get_meetings()
+    tooltip_lines = []
+    if error_msg:
+        text = "-- | 0"
+        tooltip_lines.append("Error: {0}".format(error_msg))
+    else:
+        text = "{0} | {1}".format(next_time, left_count)
+        tooltip_lines.append("Next meeting: {0}".format(next_time))
+        tooltip_lines.append("Left today: {0}".format(left_count))
+    if debug_info:
+        tooltip_lines.append(debug_info)
+    print(json.dumps({"text": text, "tooltip": "\n".join(tooltip_lines), "class": "meetings"}))
 
