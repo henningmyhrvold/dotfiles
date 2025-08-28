@@ -6,6 +6,7 @@
 # - Auto-detects timestamp units (us/ms/s) per DB
 # - Handles recurring events (RRULE) + negative exceptions
 # - Counts events that start OR overlap today (incl. all-day)
+# - Displays *meetings left today* = events whose END >= now (ongoing are included)
 # - Outputs: {"text": "HH:MM | N", "tooltip": "...", "class": "meetings"}
 # Set DEBUG=1 in the environment to get extra details in the tooltip.
 
@@ -83,7 +84,7 @@ def list_candidate_sqlites(profile_path):
             if name.endswith('.sqlite'):
                 candidates.add(os.path.join(caldir, name))
 
-    # Heuristic: if no candidates yet, scan one more level deep under calendar-data
+    # Heuristic: if no candidates yet, scan deeper under calendar-data
     if not candidates and os.path.isdir(caldir):
         for root, _, files in os.walk(caldir):
             for name in files:
@@ -157,8 +158,9 @@ def get_meetings():
     sod_local = datetime.combine(now_local.date(), time.min, tzinfo=local_tz)
     eod_local = datetime.combine(now_local.date(), time.max, tzinfo=local_tz)
 
-    todays = []
-    scanned_summary = []  # per-DB debug
+    # We'll collect (start_local, end_local) tuples for all today's instances
+    todays_instances = []
+    scanned_summary = []     # per-DB debug lines
     total_scanned = 0
     total_recur = 0
     total_single = 0
@@ -228,37 +230,52 @@ def get_meetings():
                     if rrule_str:
                         recur += 1
                         total_recur += 1
+                        # duration used for each recurrence instance
+                        duration = (dtend - dtstart) if dtend is not None else None
                         try:
                             rule = rrulestr(rrule_str, dtstart=dtstart)
                             for inst in rule.between(sod_local, eod_local, inc=True):
+                                inst_start_local = inst.astimezone(local_tz)
+                                inst_end_local = (inst_start_local + duration) if duration else None
                                 inst_utc = to_epoch(inst.astimezone(timezone.utc), unit)
                                 if (cal_id, inst_utc) not in exceptions:
-                                    todays.append(inst.astimezone(local_tz))
-                                    used_dbs.append(db)
+                                    # Keep if instance is today (starts today or overlaps today)
+                                    overlaps_today = (inst_end_local is not None and
+                                                      inst_start_local <= eod_local and
+                                                      inst_end_local >= sod_local)
+                                    starts_today = sod_local <= inst_start_local <= eod_local
+                                    if starts_today or overlaps_today:
+                                        todays_instances.append((inst_start_local, inst_end_local))
+                                        used_dbs.append(db)
                         except Exception:
-                            # If RRULE parsing fails, at least consider the base start
-                            if sod_local <= dtstart.astimezone(local_tz) <= eod_local:
-                                todays.append(dtstart.astimezone(local_tz))
+                            # If RRULE parsing fails, at least consider the base start/end
+                            start_local = dtstart.astimezone(local_tz)
+                            end_local = dtend.astimezone(local_tz) if dtend else None
+                            starts_today = sod_local <= start_local <= eod_local
+                            overlaps_today = (end_local is not None and
+                                              start_local <= eod_local and end_local >= sod_local)
+                            if starts_today or overlaps_today:
+                                todays_instances.append((start_local, end_local))
                                 used_dbs.append(db)
                     else:
                         single += 1
                         total_single += 1
-                        starts_today = sod_local <= dtstart.astimezone(local_tz) <= eod_local
-                        overlaps_today = (dtend is not None and
-                                          dtstart.astimezone(local_tz) <= eod_local and
-                                          dtend.astimezone(local_tz) >= sod_local)
+                        start_local = dtstart.astimezone(local_tz)
+                        end_local = dtend.astimezone(local_tz) if dtend else None
+                        starts_today = sod_local <= start_local <= eod_local
+                        overlaps_today = (end_local is not None and
+                                          start_local <= eod_local and end_local >= sod_local)
                         if starts_today or overlaps_today:
-                            todays.append(dtstart.astimezone(local_tz))
+                            todays_instances.append((start_local, end_local))
                             used_dbs.append(db)
 
-                first_dt = None
-                last_dt = None
+                # Per-DB debug summary (peek range of starts)
+                first_dt = last_dt = None
                 try:
-                    # peek a couple of starts for sanity
-                    starts = [from_epoch(r[2], unit, local_tz) for r in rows if r[2] is not None]
-                    starts = [s for s in starts if s is not None]
+                    starts = sorted(
+                        [from_epoch(r[2], unit, local_tz) for r in rows if r[2] is not None]
+                    )
                     if starts:
-                        starts.sort()
                         first_dt = starts[0].strftime("%Y-%m-%d")
                         last_dt = starts[-1].strftime("%Y-%m-%d")
                 except Exception:
@@ -277,48 +294,10 @@ def get_meetings():
                 scanned_summary.append(f"{os.path.basename(db)}: error:{e}")
                 continue
 
-    if not todays:
+    if not todays_instances:
         dbg = None
         if debug_on:
             used = ", ".join(sorted({os.path.basename(p) for p in used_dbs})) or "none"
             dbg = ("; ".join(scanned_summary) +
-                   f" | today=0 used_dbs=[{used}] total_scanned={total_scanned} "
-                   f"recur={total_recur} single={total_single}")
-        return "--", 0, None, dbg
-
-    todays.sort()
-    total = len(todays)
-
-    # Next meeting at/after now; if none left, keep "--"
-    next_meeting = "--"
-    for t in todays:
-        if t >= datetime.now(local_tz):
-            next_meeting = t.strftime("%H:%M")
-            break
-
-    dbg = None
-    if debug_on:
-        used = ", ".join(sorted({os.path.basename(p) for p in used_dbs}))
-        first = todays[0].strftime("%H:%M")
-        last = todays[-1].strftime("%H:%M")
-        dbg = (f"today={total} used_dbs=[{used}] total_scanned={total_scanned} "
-               f"recur={total_recur} single={total_single} first={first} last={last}")
-
-    return next_meeting, total, None, dbg
-
-# ---------- Main ----------
-
-if __name__ == "__main__":
-    next_time, total_count, error_msg, debug_info = get_meetings()
-    tooltip_lines = []
-    if error_msg:
-        text = "-- | 0"
-        tooltip_lines.append(f"Error: {error_msg}")
-    else:
-        text = f"{next_time} | {total_count}"
-        tooltip_lines.append(f"Next meeting: {next_time}")
-        tooltip_lines.append(f"Total today: {total_count}")
-    if debug_info:
-        tooltip_lines.append(debug_info)
-    print(json.dumps({"text": text, "tooltip": "\n".join(tooltip_lines), "class": "meetings"}))
+                   f" | today=0 used
 
