@@ -53,7 +53,7 @@ def get_meetings():
     # ===================================================================
     # ▼▼▼ CHANGE THIS FILENAME ▼▼▼
     # Replace 'local.sqlite' with the large .sqlite file you found in Step 1.
-    db_filename = "local.sqlite-wal"
+    db_filename = "local.sqlite"
     # ===================================================================
 
     db_path = os.path.join(profile_path, 'calendar-data', db_filename)
