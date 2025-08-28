@@ -101,13 +101,13 @@
         "on-click": "hyprctl switchxkblayout next"
     },
     "custom/email": {
-        "format": "    {}",
+        "format": "  {}",
         "exec": "~/.config/waybar/email_unread.sh",
         "interval": 60,
         "tooltip": false
     },
     "custom/meetings": {
-        "format": " {}",
+        "format": "  {}",
         "exec": "python ~/.config/waybar/meetings.py",
         "return-type": "json",
         "interval": 60,

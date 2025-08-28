@@ -134,11 +134,11 @@ def get_meetings():
 if __name__ == "__main__":
     next_time, total_count, error_msg = get_meetings()
     output = {
-        "text": f"({next_time} | {total_count})",
+        "text": f"{next_time} | {total_count}",
         "tooltip": f"Next meeting: {next_time}\nTotal today: {total_count}",
         "class": "meetings"
     }
     if error_msg:
-        output["text"] = "(-- | 0)"
+        output["text"] = "-- | 0"
         output["tooltip"] = f"Error: {error_msg}"
     print(json.dumps(output))
