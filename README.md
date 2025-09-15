@@ -35,3 +35,7 @@ List of folders and dotfiles in them:
 ## How Dotfiles are Managed
 
 There are many ways to manage your dotfiles. I use an Ansible playbook
+
+## Using Thunderbird
+
+You need to login to an email account and has a calendar that you use. On the calendar, right click on the calendar name, then click properties. Make sure the offline support is checked. 
