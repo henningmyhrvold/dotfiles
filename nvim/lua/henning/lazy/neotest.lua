@@ -12,6 +12,8 @@ return {
         require("neotest").setup({
             adapters = {
                 require("neotest-golang")({
+                    go_test_args = { "-race", "-count=1" },
+                    go_test_env = { CGO_ENABLED = "1" },
                     dap = { justMyCode = false },
                 }),
             },

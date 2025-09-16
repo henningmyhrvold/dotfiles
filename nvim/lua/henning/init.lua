@@ -1,3 +1,5 @@
+vim.g.python3_host_prog = vim.fn.expand("~/.venvs/nvim/bin/python")
+
 require("henning.set")
 require("henning.remap")
 require("henning.lazy_init")
@@ -67,3 +69,5 @@ autocmd('LspAttach', {
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
