@@ -1,16 +1,36 @@
 #!/usr/bin/env bash
+# Runs inside the pane of the new/selected session; $PWD is your project root
+session="$(tmux display-message -p '#S')"
+projdir="$PWD"
 
-# i do this to every directory i am in
-# 1 is neovim
-# 2 is where i run commands
-#
-# could be cool!!
-# this means i could create a neovim plugin to shoot commands out to "scartch"
-if [[ "$(pwd)" == $HOME/personal ]]; then
-    clear
-    return
+# 1) Editor window: Neovim
+tmux rename-window -t "$session:1" 'editor'
+tmux send-keys   -t "$session:1" 'nvim .' C-m
+
+# 2) Dev window
+tmux new-window  -t "$session:2" -n 'dev' -c "$projdir"
+if [[ -f package.json ]]; then
+  tmux send-keys -t "$session:2" 'npm run dev || pnpm dev || yarn dev' C-m
+elif [[ -f pyproject.toml ]]; then
+  # Python example — swap to what you use
+  tmux send-keys -t "$session:2" 'poetry run just dev || just dev || make dev || uvicorn app:app --reload' C-m
+elif [[ -f Cargo.toml ]]; then
+  tmux send-keys -t "$session:2" 'cargo watch -x "run"' C-m
+else
+  # Fallback — customize freely
+  tmux send-keys -t "$session:2" 'just dev || make dev || ./dev.sh' C-m
 fi
-tmux new-window -dn scratch
-vim .
-clear
+
+# 3) Prod(-ish) window
+tmux new-window  -t "$session:3" -n 'prod' -c "$projdir"
+if [[ -f docker-compose.yml || -f compose.yml ]]; then
+  tmux send-keys -t "$session:3" 'docker compose up -d && docker compose logs -f' C-m
+elif [[ -f package.json ]]; then
+  tmux send-keys -t "$session:3" 'npm start || pnpm start || yarn start' C-m
+else
+  tmux send-keys -t "$session:3" './start.sh || just start || make run' C-m
+fi
+
+# land back on the editor
+tmux select-window -t "$session:1"
 
