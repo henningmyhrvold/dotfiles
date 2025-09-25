@@ -1,36 +1,22 @@
 #!/usr/bin/env bash
-# Runs inside the pane of the new/selected session; $PWD is your project root
 session="$(tmux display-message -p '#S')"
 projdir="$PWD"
 
-# 1) Editor window: Neovim
-tmux rename-window -t "$session:1" 'editor'
+# 1) Editor (neutral)
+tmux rename-window -t "$session:1" 'Neovim'
+#tmux send-keys   -t "$session:1" 'export APP_ENV=editor' C-m
 tmux send-keys   -t "$session:1" 'nvim .' C-m
+tmux setw        -t "$session:1" @env 'editor'
 
-# 2) Dev window
+# 2) Dev (green)
 tmux new-window  -t "$session:2" -n 'dev' -c "$projdir"
-if [[ -f package.json ]]; then
-  tmux send-keys -t "$session:2" 'npm run dev || pnpm dev || yarn dev' C-m
-elif [[ -f pyproject.toml ]]; then
-  # Python example — swap to what you use
-  tmux send-keys -t "$session:2" 'poetry run just dev || just dev || make dev || uvicorn app:app --reload' C-m
-elif [[ -f Cargo.toml ]]; then
-  tmux send-keys -t "$session:2" 'cargo watch -x "run"' C-m
-else
-  # Fallback — customize freely
-  tmux send-keys -t "$session:2" 'just dev || make dev || ./dev.sh' C-m
-fi
+tmux send-keys   -t "$session:2" 'export APP_ENV=development' C-m
+tmux setw        -t "$session:2" @env 'dev'
 
-# 3) Prod(-ish) window
+# 3) Prod (red)
 tmux new-window  -t "$session:3" -n 'prod' -c "$projdir"
-if [[ -f docker-compose.yml || -f compose.yml ]]; then
-  tmux send-keys -t "$session:3" 'docker compose up -d && docker compose logs -f' C-m
-elif [[ -f package.json ]]; then
-  tmux send-keys -t "$session:3" 'npm start || pnpm start || yarn start' C-m
-else
-  tmux send-keys -t "$session:3" './start.sh || just start || make run' C-m
-fi
+tmux send-keys   -t "$session:3" 'export APP_ENV=production' C-m
+tmux setw        -t "$session:3" @env 'prod'
 
-# land back on the editor
 tmux select-window -t "$session:1"
 
