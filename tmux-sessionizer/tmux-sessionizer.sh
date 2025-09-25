@@ -4,7 +4,6 @@ projdir="$PWD"
 
 # 1) Editor (neutral)
 tmux rename-window -t "$session:1" 'Neovim'
-#tmux send-keys   -t "$session:1" 'export APP_ENV=editor' C-m
 tmux send-keys   -t "$session:1" 'nvim .' C-m
 tmux setw        -t "$session:1" @env 'editor'
 
