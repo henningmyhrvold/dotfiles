@@ -3,8 +3,8 @@
 	"height": 28,
 	"modules-left": ["custom/launcher","battery","clock#date","clock#time","custom/updates", "custom/email", "custom/meetings"],
 	"modules-center": ["hyprland/workspaces"],
-	"modules-right": ["custom/disk","cpu","memory","temperature","network","hyprland/language","pulseaudio","custom/power"], 
-	
+	"modules-right": ["custom/disk","cpu","memory","temperature","network","hyprland/language","pulseaudio","custom/power"],
+
 	"pulseaudio": {
 		"tooltip": false,
 		"scroll-step": 5,
@@ -67,7 +67,7 @@
     },
     "custom/updates": {
          "format": "  {}",
-         "exec": "checkupdates-with-aur | wc -l",
+         "exec": "(checkupdates; paru -Qua) | wc -l",
          "interval": 60,
          "on-click": "ghostty -e paru -Syu && notify-send 'The system has been updated' "
     },
