@@ -1,0 +1,23 @@
+{
+  "transports": {
+    "stdio": [
+      {
+        "id": "docker",
+        "cmd": "docker",
+        "args": [
+          "compose",
+          "-f",
+          "~/.config/mcp/docker-compose.mcp.yml",
+          "exec",
+          "-T",
+          "mcp-docker",
+          "/bin/sh",
+          "-lc",
+          "mcp-server-docker"
+        ]
+      }
+    ]
+  },
+  "default": ["docker"]
+}
+
