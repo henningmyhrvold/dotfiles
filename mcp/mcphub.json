@@ -7,7 +7,7 @@
         "args": [
           "compose",
           "-f",
-          "~/.config/mcp/docker-compose.mcp.yml",
+          "/home/henning/.config/mcp/docker-compose.mcp.yml",
           "exec",
           "-T",
           "mcp-docker",
