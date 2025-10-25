@@ -1,41 +1,8 @@
-########################
-# Mode / behavior
-########################
-mode=drun          # application launcher
-term=ghostty       # keep your terminal choice from before
-insensitive=true   # case-insensitive search
-matching=fuzzy     # fast fuzzy match when typing
-no_actions=true    # don't offer "alt actions" menu for entries
-
-########################
-# Layout / sizing
-########################
-columns=2          # force two columns
-width=900          # fixed pixel width so two padded columns ALWAYS fit
-                   # (prevents GTK from first centering, then shoving left)
-lines=10           # show 10 rows worth of entries
-dynamic_lines=false
-hide_scroll=true
-orientation=vertical
+mode=drun
+allow_images=true
+image_size=40
+term=ghostty
+insensitive=true
 location=center
-halign=center
-content_halign=fill
-
-########################
-# Icons / performance / stability
-########################
-allow_images=false # disable per-app icons in the list
-                   # this avoids width changes per row during load
-image_size=40      # kept for clarity; unused with allow_images=false
-
-########################
-# Visual polish / UX
-########################
-gtk_dark=true
+no_actions=true
 prompt=Search
-hide_search=false  # keep the search field visible
-allow_markup=false
-exec_search=false
-parse_search=false
-no_custom_entry=false
-
