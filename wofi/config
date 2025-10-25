@@ -1,40 +1,41 @@
 ########################
 # Mode / behavior
 ########################
-mode=drun          # Show desktop applications
-term=ghostty       # Keep your terminal choice
-insensitive=true   # Case-insensitive search
-matching=fuzzy     # Fuzzy match so you can type fragments quickly
-no_actions=true    # Disable alternative actions menu
+mode=drun          # application launcher
+term=ghostty       # keep your terminal choice from before
+insensitive=true   # case-insensitive search
+matching=fuzzy     # fast fuzzy match when typing
+no_actions=true    # don't offer "alt actions" menu for entries
 
 ########################
-# Visual layout
+# Layout / sizing
 ########################
-location=center    # Center the launcher on screen
-width=40%          # Fixed width so GTK doesn't keep resizing
-lines=10           # Fixed height in rows so it doesn't "grow in"
+columns=2          # force two columns
+width=900          # fixed pixel width so two padded columns ALWAYS fit
+                   # (prevents GTK from first centering, then shoving left)
+lines=10           # show 10 rows worth of entries
 dynamic_lines=false
-
-columns=1          # Force a single column. Prevents 2-column → 1-column snap
-hide_scroll=true   # Hide scrollbar for a cleaner look
+hide_scroll=true
 orientation=vertical
+location=center
 halign=center
 content_halign=fill
 
 ########################
-# Icons / performance
+# Icons / performance / stability
 ########################
-allow_images=false # Do NOT load app icons. Much faster and more stable layout
-image_size=40      # Kept for completeness, but ignored when allow_images=false
+allow_images=false # disable per-app icons in the list
+                   # this avoids width changes per row during load
+image_size=40      # kept for clarity; unused with allow_images=false
 
 ########################
-# UI polish
+# Visual polish / UX
 ########################
-gtk_dark=true      # Ask GTK for dark theme
-prompt=Search      # Keep your visible prompt
-hide_search=false  # Keep the search entry visible
-allow_markup=false # Treat entries as plain text, safer
-exec_search=false  # Hitting Enter runs the selected entry, not raw text
-parse_search=false # Don't treat search text specially
+gtk_dark=true
+prompt=Search
+hide_search=false  # keep the search field visible
+allow_markup=false
+exec_search=false
+parse_search=false
 no_custom_entry=false
 
