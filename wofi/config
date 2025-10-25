@@ -1,8 +1,40 @@
-mode=drun
-allow_images=true
-image_size=40
-term=ghostty
-insensitive=true
-location=center
-no_actions=true
-prompt=Search
+########################
+# Mode / behavior
+########################
+mode=drun          # Show desktop applications
+term=ghostty       # Keep your terminal choice
+insensitive=true   # Case-insensitive search
+matching=fuzzy     # Fuzzy match so you can type fragments quickly
+no_actions=true    # Disable alternative actions menu
+
+########################
+# Visual layout
+########################
+location=center    # Center the launcher on screen
+width=40%          # Fixed width so GTK doesn't keep resizing
+lines=10           # Fixed height in rows so it doesn't "grow in"
+dynamic_lines=false
+
+columns=1          # Force a single column. Prevents 2-column → 1-column snap
+hide_scroll=true   # Hide scrollbar for a cleaner look
+orientation=vertical
+halign=center
+content_halign=fill
+
+########################
+# Icons / performance
+########################
+allow_images=false # Do NOT load app icons. Much faster and more stable layout
+image_size=40      # Kept for completeness, but ignored when allow_images=false
+
+########################
+# UI polish
+########################
+gtk_dark=true      # Ask GTK for dark theme
+prompt=Search      # Keep your visible prompt
+hide_search=false  # Keep the search entry visible
+allow_markup=false # Treat entries as plain text, safer
+exec_search=false  # Hitting Enter runs the selected entry, not raw text
+parse_search=false # Don't treat search text specially
+no_custom_entry=false
+
