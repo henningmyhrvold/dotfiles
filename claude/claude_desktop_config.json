@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "filesystem": { ... },
+    "python-repl": { ... },
+    "postgres": { ... }
+  }
+}
